@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Raqib — voice</title>
+<style>body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(160deg,#102A43,#1d4e74);color:#fff;display:grid;place-items:center;height:100vh;text-align:center}
+button{width:110px;height:110px;border-radius:50%;border:0;background:#C5A468;color:#102A43;font-size:44px;cursor:pointer;box-shadow:0 0 0 0 rgba(125,255,178,.6)}button.on{animation:p 1.2s infinite;background:#7dffb2}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(125,255,178,.6)}100%{box-shadow:0 0 0 28px rgba(125,255,178,0)}}#t{min-height:48px;margin:18px 20px 6px;font-size:17px;line-height:1.5}small{opacity:.7}#c{display:none;margin-top:10px;border:0;border-radius:10px;padding:8px 14px;background:#fff;color:#102A43;font-weight:800;cursor:pointer}</style></head>
+<body><div><button id="b">🎙</button><div id="t" dir="auto"></div><small id="s">Raqib is listening…</small><br><button id="c">Copy text</button></div>
+<script>
+const q=new URLSearchParams(location.search),lang=q.get('lang')||'ar-EG',SR=window.SpeechRecognition||window.webkitSpeechRecognition,b=document.getElementById('b'),t=document.getElementById('t'),s=document.getElementById('s'),c=document.getElementById('c');
+if(lang.startsWith('ar')){s.textContent='رقيب بيسمعك…';document.documentElement.dir='rtl';}
+function send(txt){try{if(window.opener){window.opener.postMessage({type:'raqib-voice',text:txt},'*');setTimeout(()=>window.close(),300);return;}}catch(e){}s.textContent=lang.startsWith('ar')?'انسخ النص والصقه في رقيب':'Copy the text into Raqib';c.style.display='inline-block';c.onclick=()=>navigator.clipboard.writeText(txt);}
+function go(){if(!SR){s.textContent='Use Chrome or Edge';return;}const r=new SR();r.lang=lang;r.interimResults=true;b.classList.add('on');
+  r.onresult=e=>{const x=[...e.results].map(v=>v[0].transcript).join(' ');t.textContent=x;if(e.results[e.results.length-1].isFinal){b.classList.remove('on');send(x);}};
+  r.onerror=e=>{b.classList.remove('on');s.textContent=(e.error==='not-allowed'?(lang.startsWith('ar')?'اسمح للمايك من علامة القفل جنب العنوان':'Allow the microphone from the lock icon'):'⚠ '+e.error);};r.onend=()=>b.classList.remove('on');r.start();}
+b.onclick=go;go();
+</script></body></html>
